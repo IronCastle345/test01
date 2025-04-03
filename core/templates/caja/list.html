@@ -1,0 +1,54 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="{% static 'css/buttons.css' %}">
+</head>
+<body>
+    <h1>Lista de Cajas</h1>
+    <a href="{% url 'crear_caja' %}" class="btn btn-secondary">Registar Caja</a>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Cantidad de Piezas</th>
+                <th>Tipo de Piezas</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody id="lista_cajas">
+            {% for caja in cajas %}
+            <tr>
+                <td>{{caja.nombre}}</td>
+                <td>{{caja.cant_piezas}}</td>
+                <td>
+                        {% for tipo in caja.tipo_de_pieza_set.all %}
+                            {{ tipo.nombre }} ({{ tipo.tipo }})
+                        {% endfor %}
+                </td>
+                <td>
+                    <form action="{% url 'eliminar_caja' caja.id %}" method="post" style="display: inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger" onclick="return confirm('¿Seguro que quieres eliminar esta caja?')">
+                            <i class="bi bi-trash"></i> Eliminar
+                        </button>
+                    </form>
+                    <!-- Botón Editar -->
+                    <a href="{% url 'editar_caja' caja.id %}" class="btn btn-info">
+                    <i class="bi bi-pencil"></i> Editar
+                    </a>
+                    <a href="{% url 'contenido_caja' caja.id %}" class="btn btn-secondary btn-sm">
+                        <i class="bi bi-box-seam"></i> Ver contenido
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+</body>
+</html>

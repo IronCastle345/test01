@@ -1,0 +1,62 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="{% static 'css/buttons.css' %}">
+</head>
+<body>
+    <h1>Piezas</h1>
+    <div class="container">
+        <h2>Contenido de la caja: {{ caja.nombre }}</h2>
+        
+        <table class="table table-striped mi-tabla" border="2">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Tipo</th>
+                    <th>Codigo</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for pieza in piezas %}
+                <tr>
+                    <td>{{ pieza.nombre }}</td>
+                    <td>{{ pieza.tipo }}</td>
+                    <td>{{ pieza.codigo }}</td>
+                    <td>
+                         <!-- Botón Editar -->
+                        <a href="{% url 'editar_pieza' pieza.id %}" class="btn btn-warning btn-sm">
+                            <i class="bi bi-pencil"></i> Editar
+                        </a>
+                        <!-- Botón Eliminar -->
+                        <form action="{% url 'eliminar_pieza' pieza.id %}" method="post" style="display: inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('¿Eliminar esta pieza?')">
+                                <i class="bi bi-trash"></i> Eliminar
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="3">Esta caja no tiene piezas registradas</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <div class="enlaces">
+            <a href="{% url 'agregar_pieza' caja.id %}" class="btn btn-primary">
+                <i class="bi bi-plus-circle"></i> Agregar Pieza
+            </a>
+            <a href="{% url 'listar_caja' %}" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> Volver
+            </a>
+        </div>
+    </div>
+</body>
+</html>
