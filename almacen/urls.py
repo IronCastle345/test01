@@ -20,8 +20,9 @@ from core import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', views.hola),
-    path('cajas/', views.listarCajas, name='listar_caja'),
+    path('', views.parles_dashboard),
+    path('cajas/', views.listar_cajas, name='listar_caja'),
+    path('cajas/parle/<int:parle_id>/', views.listar_cajas, name='cajas_por_parle'),
     path('cajas/crear', views.registrarCaja, name='crear_caja'),
     path('cajas/eliminar/<int:id>/', views.eliminar_caja, name='eliminar_caja'),
     path('cajas/editar/<int:id>/', views.editar_caja, name='editar_caja'),
@@ -29,4 +30,9 @@ urlpatterns = [
     path('cajas/<int:id>/agregar-pieza/', views.agregar_pieza, name='agregar_pieza'),
     path('piezas/eliminar/<int:id>/', views.eliminar_pieza, name='eliminar_pieza'),
     path('piezas/editar/<int:id>/', views.editar_pieza, name='editar_pieza'),
+    path('parles/', views.parles_dashboard, name='parles_dashboard'),
+    path('parles/crear/', views.crear_parle, name='crear_parle'),
+    path('parles/<int:id>/actualizar/', views.actualizar_parle, name='actualizar_parle'),
+    path('parles/<int:id>/eliminar/', views.eliminar_parle, name='eliminar_parle'),
+    path('parles/<int:id>/actualizar-nombre/', views.actualizar_nombre_parle, name='actualizar_nombre_parle'),
 ]

@@ -1,0 +1,50 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="{% static 'css/parles.css' %}">
+</head>
+<body>
+    <div class="parle-dashboard">
+        <button id="add-parle" class="btn btn-primary mb-3">
+            <i class="bi bi-plus-square"></i> <span class="desktop-text">Agregar Parle</span>
+            <span class="mobile-text">+</span>
+        </button>
+    
+        <div id="parle-map">
+            {% for parle in parles %}
+            <div class="parle-box"
+                data-id="{{ parle.id }}"
+                data-x="{{ parle.pos_x|default:0 }}"
+                data-y="{{ parle.pos_y|default:0 }}"
+                data-width="{{ parle.ancho|default:200 }}"
+                data-height="{{ parle.alto|default:150 }}">
+                <h5 class="editable-nombre" data-id="{{ parle.id }}">{{ parle.nombre }}
+                    <i class="bi bi-pencil-square edit-icon"></i> 
+                </h5>
+                <p>Cajas: {{ parle.cant_cajas }}</p>
+                <button class="btn btn-sm btn-success view-boxes">Ver Cajas</button>
+                <button class="btn btn-sm btn-danger delete-parle">Eliminar</button>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    
+    <!-- CSS para ocultar/mostrar texto en móviles -->
+    <style>
+        @media (max-width: 768px) {
+            .desktop-text { display: none; }
+            .mobile-text { display: inline; }
+        }
+        @media (min-width: 769px) {
+            .mobile-text { display: none; }
+        }
+    </style>
+    
+    <script src="https://cdn.jsdelivr.net/npm/interactjs/dist/interact.min.js"></script>
+    <script src="{% static 'js/parles.js' %}"></script>
+</body>
+</html>

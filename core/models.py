@@ -1,16 +1,20 @@
 from django.db import models
 
-# Create your models here.
+
 class parle(models.Model):
-    nombre = models.CharField(max_length=200,null=True,blank=True)
-    cant_cajas = models.IntegerField()
+    nombre = models.CharField(max_length=200,null=True,blank=True,default="Nuevo Parle")
+    cant_cajas = models.IntegerField(default=0)
+    pos_x = models.IntegerField(default=0)  # Posición en el eje X
+    pos_y = models.IntegerField(default=0)  # Posición en el eje Y
+    ancho = models.IntegerField(default=200)  # Ancho del cuadrado
+    alto = models.IntegerField(default=150)  # Alto del cuadrado
 
     def __str__(self):
         return f"{self.nombre}"
 
 class caja(models.Model):
     nombre = models.CharField(max_length=200, null=True,blank=True)
-    id_parle = models.ForeignKey(parle, on_delete=models.SET_NULL,null=True,blank=True)
+    id_parle = models.ForeignKey(parle, on_delete=models.SET_NULL,null=True,blank=True,verbose_name="Parle asociado")
     cant_piezas = models.IntegerField()
 
     def __str__(self):

@@ -11,6 +11,17 @@
 <body>
     <h1>Lista de Cajas</h1>
     <a href="{% url 'crear_caja' %}" class="btn btn-secondary">Registar Caja</a>
+    <a href="{% url 'parles_dashboard' %}" class="btn btn-secondary mb-3">
+        <i class="bi bi-arrow-left"></i> Volver al Mapa
+    </a>
+    {% if parle_filtrado %}
+        <h3>Cajas del Parle: {{ parle_filtrado.nombre }}</h3>
+        <a href="{% url 'parles_dashboard' %}" class="btn btn-secondary mb-3">
+            <i class="bi bi-arrow-left"></i> Volver al Mapa
+        </a>
+    {% else %}
+        <h3>Todas las Cajas</h3>
+    {% endif %}
     <table border="1">
         <thead>
             <tr>

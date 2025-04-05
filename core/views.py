@@ -1,15 +1,27 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import caja, parle, tipo_de_pieza, pieza
 from django import forms
+import json
+from django.http import JsonResponse
+from django.views.decorators.http import require_http_methods
 
 # Create your views here.
 
 def hola(request):
     return render(request, 'index.html')
 
-def listarCajas(request):
-    cajas = caja.objects.prefetch_related('tipo_de_pieza_set').all()
-    return render(request, 'caja/list.html', {'cajas': cajas})
+def listar_cajas(request, parle_id=None):
+    cajas = caja.objects.all()
+    Parle = None
+    
+    if parle_id:
+        Parle = get_object_or_404(parle, id=parle_id)
+        cajas = cajas.filter(id_parle=Parle)
+    
+    return render(request, 'caja/list.html', {
+        'cajas': cajas,
+        'parle_filtrado': Parle
+    })
 
 class CajaForm(forms.ModelForm):
     # Campos para nuevo Tipo_de_pieza
@@ -188,3 +200,96 @@ def editar_pieza(request, id):
         'form': form,
         'pieza': Pieza
     })
+
+def parles_dashboard(request):
+    Parles = parle.objects.all()
+    return render(request, 'parles/dashboard.html', {'parles': Parles})
+
+def crear_parle(request):
+    if request.method == 'POST':
+        # Obtener el último Parle
+        ultimo_parle = parle.objects.order_by('-id').first()
+        
+        # Calcular posición
+        if ultimo_parle:
+            nueva_x = ultimo_parle.pos_x + ultimo_parle.ancho + 20  # 20px de separación
+            nueva_y = ultimo_parle.pos_y
+        else:
+            nueva_x = 50  # Posición inicial X
+            nueva_y = 50  # Posición inicial Y
+        
+        # Crear Parle
+        nuevo_parle = parle.objects.create(
+            pos_x=nueva_x,
+            pos_y=nueva_y,
+            ancho=200,
+            alto=150
+        )
+        
+        return JsonResponse({
+            'id': nuevo_parle.id,
+            'nombre': nuevo_parle.nombre,
+            'pos_x': nuevo_parle.pos_x,
+            'pos_y': nuevo_parle.pos_y,
+            'ancho': nuevo_parle.ancho,
+            'alto': nuevo_parle.alto
+        })
+    return redirect('parles_dashboard')
+
+@require_http_methods(["POST"])
+def actualizar_parle(request, id):
+    Parle = get_object_or_404(parle, id=id)
+    data = json.loads(request.body)
+    
+    if 'x' in data and 'y' in data:
+        Parle.pos_x = data['x']
+        Parle.pos_y = data['y']
+    
+    if 'width' in data and 'height' in data:
+        Parle.ancho = data['width']
+        Parle.alto = data['height']
+    
+    Parle.save()  # <-- ¡Aquí estaba el error! (Parle, no parle)
+    return JsonResponse({'status': 'success'})
+
+def eliminar_parle(request, id):
+    if request.method == 'POST':
+        Parle = parle.objects.get(id=id)
+        Parle.delete()
+        return JsonResponse({'status': 'success'})
+    return JsonResponse({'status': 'error'}, status=400)
+
+@require_http_methods(["POST"])
+def actualizar_parle(request, id):
+    Parle = get_object_or_404(parle, id=id)
+    data = json.loads(request.body)
+    
+    # Actualizar posición
+    if 'x' in data and 'y' in data:
+        Parle.pos_x = data['x']
+        Parle.pos_y = data['y']
+    
+    # Actualizar tamaño
+    if 'width' in data and 'height' in data:
+        Parle.ancho = data['width']
+        Parle.alto = data['height']
+    
+    parle.save()
+    return JsonResponse({'status': 'success'})
+
+@require_http_methods(["POST"])
+def actualizar_nombre_parle(request, id):
+    Parle = get_object_or_404(parle, id=id)
+    try:
+        data = json.loads(request.body)
+        nuevo_nombre = data.get('nombre', '').strip()
+        
+        if not nuevo_nombre:
+            return JsonResponse({'status': 'error', 'message': 'Nombre vacío'}, status=400)
+        
+        Parle.nombre = nuevo_nombre
+        Parle.save()
+        return JsonResponse({'status': 'success', 'nombre': Parle.nombre})
+    
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
